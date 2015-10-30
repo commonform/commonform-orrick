@@ -1,6 +1,6 @@
 [
 {
-"headering": "The undersigned executes this Election Under Section 83(b) of the Internal Revenue Code of 1986 as of the date written below.",
+"header": "The undersigned executes this Election Under Section 83(b) of the Internal Revenue Code of 1986 as of the date written below.",
 "name":"{{{Name}}}",
 "term": "Purchaser",
 "information":["address"]
