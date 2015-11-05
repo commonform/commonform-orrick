@@ -1,10 +1,10 @@
 BLANKS=blanks.json
-FORMS=$(wildcard *.commonform)
+FORMS = $(shell find . -type f -name '*.commonform')
 COMMONFORM=node_modules/.bin/commonform
 MUSTACHE=node_modules/.bin/mustache
 JSON=node_modules/.bin/json
 FOUNDERS=1 2
-PER_COMPANY=action-of-incorporator board-resolutions bylaws certificate-of-incorporation incorporator-certificate-of-adoption indemnification-agreement indemnification-agreement-resolutions secretary-certificate-of-adption
+PER_COMPANY=action-of-incorporator board-resolutions bylaws certificate-of-incorporation incorporator-certificate-of-adoption indemnification-agreement indemnification-agreement-resolutions secretary-certificate-of-adption mutual-nda equity-comp/stock-plan
 PER_FOUNDER=stock-purchase-agreement assignment-of-other-assets stock-power receipt 83-b-election receipt-and-consent 83-b-statement-acknowledgement indemnification-agreement
 FOUNDER=$(foreach form,$(PER_FOUNDER),$(foreach founder,$(FOUNDERS),$(form)-$(founder)))
 

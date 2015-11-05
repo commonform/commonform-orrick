@@ -1,0 +1,11 @@
+{
+  "Automatically Designated Material": [ true, false ],
+  "Biotech": [ true, false ],
+  "Jurisdiction": [ true, false ],
+  "No Publicity": [ true, false ],
+  "Public Company": [
+    false,
+    { "Trading Market": true },
+    { "Trading Market": false }
+  ]
+}
