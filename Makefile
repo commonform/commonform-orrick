@@ -18,13 +18,7 @@ docx: $(PER_COMPANY:=.docx) $(FOUNDER:=.docx)
 
 pdf: $(PER_COMPANY:=.pdf) $(FOUNDER:=.pdf)
 
-$(COMMONFORM) $(CFTEMPLATE):
-	npm i
-
-$(MUSTACHE):
-	npm i
-
-$(JSON):
+$(COMMONFORM) $(CFTEMPLATE) $(MUSTACHE) $(JSON):
 	npm i
 
 %.pdf: %.docx
