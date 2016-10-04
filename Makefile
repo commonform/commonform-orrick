@@ -75,7 +75,7 @@ test: variants $(COMMONFORM)
 	for variant in variants/* ; do \
 		echo ; \
 		echo $$variant; \
-		$(COMMONFORM) lint < $$variant; \
+		$(COMMONFORM) lint < $$variant | fgrep -v "only once" || echo "No errors"; \
 	done; \
 
 critique: $(FORMS) $(COMMONFORM)
