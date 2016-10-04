@@ -85,9 +85,3 @@ critique: $(FORMS) $(COMMONFORM)
 
 clean:
 	git clean -fdx
-
-share: variants $(COMMONFORM)
-	for variant in variants/* ; do \
-		echo $$variant; \
-		$(COMMONFORM) share < $$variant; \
-	done
