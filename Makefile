@@ -1,5 +1,5 @@
 BLANKS=blanks.json
-FORMS = $(shell find . -type f -name '*.commonform')
+FORMS = $(shell find . -type f -name '*.cftemplate')
 COMMONFORM=node_modules/.bin/commonform
 CFTEMPLATE=node_modules/.bin/cftemplate
 MUSTACHE=node_modules/.bin/mustache
@@ -37,23 +37,23 @@ $(COMMONFORM) $(CFTEMPLATE) $(MUSTACHE) $(JSON):
 %.options: %.options-template $(BLANKS) $(MUSTACHE)
 	$(MUSTACHE) $(BLANKS) $*.options-template > $@
 
-%-1.docx: %.commonform %.options %-1.sigs.json 1.blanks.json $(COMMONFORM) $(CFTEMPLATE)
-	$(CFTEMPLATE) $*.commonform 1.blanks.json | \
+%-1.docx: %.cftemplate %.options %-1.sigs.json 1.blanks.json $(COMMONFORM) $(CFTEMPLATE)
+	$(CFTEMPLATE) $*.cftemplate 1.blanks.json | \
 	$(COMMONFORM) render --format docx --blanks 1.blanks.json --signatures $*-1.sigs.json $(shell cat $*.options) > $@
 
-%-2.docx: %.commonform %.options %-2.sigs.json 2.blanks.json $(COMMONFORM) $(CFTEMPLATE)
-	$(CFTEMPLATE) $*.commonform 2.blanks.json | \
+%-2.docx: %.cftemplate %.options %-2.sigs.json 2.blanks.json $(COMMONFORM) $(CFTEMPLATE)
+	$(CFTEMPLATE) $*.cftemplate 2.blanks.json | \
 	$(COMMONFORM) render --format docx --blanks 2.blanks.json --signatures $*-2.sigs.json $(shell cat $*.options) > $@
 
 %.sigs.json: %.sigs.js $(BLANKS) $(MUSTACHE)
 	node $*.sigs.js < $(BLANKS) > $@
 
-%.docx: %.commonform %.options %.sigs.json $(BLANKS) $(COMMONFORM) $(CFTEMPLATE)
-	$(CFTEMPLATE) $*.commonform $(BLANKS) | \
+%.docx: %.cftemplate %.options %.sigs.json $(BLANKS) $(COMMONFORM) $(CFTEMPLATE)
+	$(CFTEMPLATE) $*.cftemplate $(BLANKS) | \
 	$(COMMONFORM) render --format docx --blanks $(BLANKS) --signatures $*.sigs.json $(shell cat $*.options) > $@
 
-%.docx: %.commonform %.options $(BLANKS) $(COMMONFORM) $(CFTEMPLATE)
-	$(CFTEMPLATE) $*.commonform $(BLANKS) | \
+%.docx: %.cftemplate %.options $(BLANKS) $(COMMONFORM) $(CFTEMPLATE)
+	$(CFTEMPLATE) $*.cftemplate $(BLANKS) | \
 	$(COMMONFORM) render --format docx --blanks $(BLANKS) $(shell cat $*.options) > $@
 
 .PHONY: clean test variants critique
@@ -61,7 +61,7 @@ $(COMMONFORM) $(CFTEMPLATE) $(MUSTACHE) $(JSON):
 variants: $(FORMS)
 	rm -rf variants
 	for form in $(FORMS); do \
-		base=$$(basename $$form .commonform) ; \
+		base=$$(basename $$form .cftemplate) ; \
 		node generate-variants.js $$base; \
 	done
 

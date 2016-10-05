@@ -5,7 +5,7 @@ var cftemplate = require('cftemplate')
 
 var base = process.argv[2]
 
-var templateFile = base + '.commonform'
+var templateFile = base + '.cftemplate'
 var template
 
 var schemaFile = base + '.schema'
