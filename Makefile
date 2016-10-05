@@ -1,6 +1,7 @@
 BLANKS=blanks.json
-FORMS = $(shell find . -type f -name '*.commonform')
+FORMS = $(shell find . -type f -name '*.cftemplate')
 COMMONFORM=node_modules/.bin/commonform
+CFTEMPLATE=node_modules/.bin/cftemplate
 MUSTACHE=node_modules/.bin/mustache
 JSON=node_modules/.bin/json
 FOUNDERS=1 2
@@ -15,17 +16,9 @@ pdfs.zip: pdf
 
 docx: $(PER_COMPANY:=.docx) $(FOUNDER:=.docx)
 
-html: $(PER_COMPANY:=.html) $(FOUNDER:=.html)
-
 pdf: $(PER_COMPANY:=.pdf) $(FOUNDER:=.pdf)
 
-$(COMMONFORM):
-	npm i
-
-$(MUSTACHE):
-	npm i
-
-$(JSON):
+$(COMMONFORM) $(CFTEMPLATE) $(MUSTACHE) $(JSON):
 	npm i
 
 %.pdf: %.docx
@@ -44,35 +37,31 @@ $(JSON):
 %.options: %.options-template $(BLANKS) $(MUSTACHE)
 	$(MUSTACHE) $(BLANKS) $*.options-template > $@
 
-%-1.docx: %.commonform %.options %-1.sigs.json 1.blanks.json $(COMMONFORM) $(MUSTACHE)
-	$(MUSTACHE) 1.blanks.json $*.commonform | \
+%-1.docx: %.cftemplate %.options %-1.sigs.json 1.blanks.json $(COMMONFORM) $(CFTEMPLATE)
+	$(CFTEMPLATE) $*.cftemplate 1.blanks.json | \
 	$(COMMONFORM) render --format docx --blanks 1.blanks.json --signatures $*-1.sigs.json $(shell cat $*.options) > $@
 
-%-2.docx: %.commonform %.options %-2.sigs.json 2.blanks.json $(COMMONFORM) $(MUSTACHE)
-	$(MUSTACHE) 2.blanks.json $*.commonform | \
+%-2.docx: %.cftemplate %.options %-2.sigs.json 2.blanks.json $(COMMONFORM) $(CFTEMPLATE)
+	$(CFTEMPLATE) $*.cftemplate 2.blanks.json | \
 	$(COMMONFORM) render --format docx --blanks 2.blanks.json --signatures $*-2.sigs.json $(shell cat $*.options) > $@
 
-%.sigs.json: %.sigs $(BLANKS) $(MUSTACHE)
-	$(MUSTACHE) $(BLANKS) $*.sigs | sed 's/,]/]/' > $@
+%.sigs.json: %.sigs.js $(BLANKS) $(MUSTACHE)
+	node $*.sigs.js < $(BLANKS) > $@
 
-%.docx: %.commonform %.options %.sigs.json $(BLANKS) $(COMMONFORM) $(MUSTACHE)
-	$(MUSTACHE) $(BLANKS) $*.commonform | \
+%.docx: %.cftemplate %.options %.sigs.json $(BLANKS) $(COMMONFORM) $(CFTEMPLATE)
+	$(CFTEMPLATE) $*.cftemplate $(BLANKS) | \
 	$(COMMONFORM) render --format docx --blanks $(BLANKS) --signatures $*.sigs.json $(shell cat $*.options) > $@
 
-%.docx: %.commonform %.options $(BLANKS) $(COMMONFORM) $(MUSTACHE)
-	$(MUSTACHE) $(BLANKS) $*.commonform | \
+%.docx: %.cftemplate %.options $(BLANKS) $(COMMONFORM) $(CFTEMPLATE)
+	$(CFTEMPLATE) $*.cftemplate $(BLANKS) | \
 	$(COMMONFORM) render --format docx --blanks $(BLANKS) $(shell cat $*.options) > $@
-
-%.html: %.commonform %.options $(BLANKS) $(COMMONFORM)
-	$(MUSTACHE) $(BLANKS) $*.commonform | \
-	$(COMMONFORM) render --format html5 --blanks $(BLANKS) $(shell cat $*.options) > $@
 
 .PHONY: clean test variants critique
 
 variants: $(FORMS)
 	rm -rf variants
 	for form in $(FORMS); do \
-		base=$$(basename $$form .commonform) ; \
+		base=$$(basename $$form .cftemplate) ; \
 		node generate-variants.js $$base; \
 	done
 
@@ -80,7 +69,7 @@ test: variants $(COMMONFORM)
 	for variant in variants/* ; do \
 		echo ; \
 		echo $$variant; \
-		$(COMMONFORM) lint < $$variant; \
+		$(COMMONFORM) lint < $$variant | fgrep -v "only once" || echo "No errors"; \
 	done; \
 
 critique: $(FORMS) $(COMMONFORM)
@@ -90,9 +79,3 @@ critique: $(FORMS) $(COMMONFORM)
 
 clean:
 	git clean -fdx
-
-share: variants $(COMMONFORM)
-	for variant in variants/* ; do \
-		echo $$variant; \
-		$(COMMONFORM) share < $$variant; \
-	done
